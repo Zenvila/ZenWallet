@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ZenWallet</title>
+</head>
+<body style="margin: 0; font-family: Arial, sans-serif; background: #f2f2f2;">
+  <div id="root"></div>
+</body>
+</html>
+
+// frontend/src/App.js
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+
+function App() {
+  const [transactions, setTransactions] = useState([]);
+  const [title, setTitle] = useState('');
+  const [amount, setAmount] = useState('');
+
+  useEffect(() => {
+    axios.get('http://localhost:3000/transactions')
+      .then(res => setTransactions(res.data.transactions));
+  }, []);
+
+  const addTransaction = () => {
+    axios.post('http://localhost:3000/add', { title, amount: parseFloat(amount) })
+      .then(() => window.location.reload());
+  };
+
+  return (
+    <div style={{ fontFamily: 'Arial', background: '#f0f4f8', minHeight: '100vh' }}>
+      <div style={{ backgroundColor: '#1e3a8a', color: 'white', padding: '20px', textAlign: 'center' }}>
+        <h1 style={{ margin: 0 }}>💸 ZenWallet</h1>
+        <p style={{ marginTop: '5px', fontWeight: '300' }}>Track your spending effortlessly</p>
+      </div>
+
+      <div style={{ padding: 20, maxWidth: 600, margin: '0 auto' }}>
+        <h2>Add Transaction</h2>
+        <input style={{ width: '100%', padding: 10, marginBottom: 10 }} placeholder="Title" onChange={e => setTitle(e.target.value)} />
+        <input style={{ width: '100%', padding: 10, marginBottom: 10 }} placeholder="Amount" type="number" onChange={e => setAmount(e.target.value)} />
+        <button style={{ padding: 10, backgroundColor: '#1e3a8a', color: 'white', border: 'none', width: '100%' }} onClick={addTransaction}>Add</button>
+
+        <h3 style={{ marginTop: 30 }}>Transactions</h3>
+        <ul style={{ listStyle: 'none', padding: 0 }}>
+          {transactions.map(tx => (
+            <li key={tx._id} style={{ backgroundColor: 'white', marginBottom: 10, padding: 10, borderRadius: 5, boxShadow: '0 2px 5px rgba(0,0,0,0.1)' }}>
+              <strong>{tx.title}</strong> - ${tx.amount}
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  );
+}
+
+export default App;
